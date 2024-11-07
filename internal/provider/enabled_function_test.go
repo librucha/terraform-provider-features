@@ -4,14 +4,13 @@
 package provider
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/tfversion"
 )
 
-func TestExampleFunction_Known(t *testing.T) {
+func TestEnabledFunction_Enabled(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_8_0),
@@ -20,19 +19,26 @@ func TestExampleFunction_Known(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: `
+				locals {
+				  features = {
+					"key1" = true
+					"key2" = false
+					"key3" = null
+				  }
+				}
 				output "test" {
-					value = provider::scaffolding::example("testvalue")
+				  value = provider::features::enabled(["key1"], local.features)
 				}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckOutput("test", "testvalue"),
+					resource.TestCheckOutput("test", "true"),
 				),
 			},
 		},
 	})
 }
 
-func TestExampleFunction_Null(t *testing.T) {
+func TestEnabledFunction_Disabled(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_8_0),
@@ -41,18 +47,26 @@ func TestExampleFunction_Null(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: `
+				locals {
+				  features = {
+					"key1" = true
+					"key2" = false
+					"key3" = null
+				  }
+				}
 				output "test" {
-					value = provider::scaffolding::example(null)
+				  value = provider::features::enabled(["key2"], local.features)
 				}
 				`,
-				// The parameter does not enable AllowNullValue
-				ExpectError: regexp.MustCompile(`argument must not be null`),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckOutput("test", "false"),
+				),
 			},
 		},
 	})
 }
 
-func TestExampleFunction_Unknown(t *testing.T) {
+func TestEnabledFunction_Null(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_8_0),
@@ -61,16 +75,19 @@ func TestExampleFunction_Unknown(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: `
-				resource "terraform_data" "test" {
-					input = "testvalue"
+				locals {
+				  features = {
+					"key1" = true
+					"key2" = false
+					"key3" = null
+				  }
 				}
-				
 				output "test" {
-					value = provider::scaffolding::example(terraform_data.test.output)
+				  value = provider::features::enabled(["key3"], local.features)
 				}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckOutput("test", "testvalue"),
+					resource.TestCheckOutput("test", "false"),
 				),
 			},
 		},
