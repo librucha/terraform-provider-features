@@ -10,8 +10,7 @@ import (
 )
 
 var (
-	_   function.Function = EnabledFunction{}
-	b2i                   = map[bool]int8{false: 0, true: 1}
+	_ function.Function = EnabledFunction{}
 )
 
 func NewEnabledFunction() function.Function {
