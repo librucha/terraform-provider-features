@@ -50,6 +50,7 @@ func (p *FeaturesProvider) Functions(ctx context.Context) []func() function.Func
 	return []func() function.Function{
 		NewEnabledFunction,
 		NewCountFunction,
+		NewMergeFunction,
 	}
 }
 
