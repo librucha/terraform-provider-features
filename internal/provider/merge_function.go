@@ -56,7 +56,7 @@ func (r MergeFunction) Run(ctx context.Context, req function.RunRequest, resp *f
 	if resp.Error != nil {
 		return
 	}
-	for k, _ := range *defaultFeatures {
+	for k := range *defaultFeatures {
 		val, ok := (*features)[k]
 		if ok {
 			(*defaultFeatures)[k] = val
